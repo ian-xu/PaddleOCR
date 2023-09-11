@@ -22,6 +22,7 @@ from __future__ import print_function
 
 import paddle
 from paddle import nn
+from paddle.nn import CrossEntropyLoss
 
 from .det_basic_loss import BalanceLoss, MaskL1Loss, DiceLoss
 
@@ -50,11 +51,14 @@ class DBLoss(nn.Layer):
             balance_loss=balance_loss,
             main_loss_type=main_loss_type,
             negative_ratio=ohem_ratio)
+        self.loss_classes = CrossEntropyLoss()
 
     def forward(self, predicts, labels):
         predict_maps = predicts['maps']
-        label_threshold_map, label_threshold_mask, label_shrink_map, label_shrink_mask = labels[
-            1:]
+        if len(labels) >= 5:
+            label_threshold_map, label_threshold_mask, label_shrink_map, label_shrink_mask, _ = labels[1:]
+        else:
+            raise Exception("err")
         shrink_maps = predict_maps[:, 0, :, :]
         threshold_maps = predict_maps[:, 1, :, :]
         binary_maps = predict_maps[:, 2, :, :]
@@ -79,7 +83,7 @@ class DBLoss(nn.Layer):
 
         loss_all = loss_shrink_maps + loss_threshold_maps \
                    + loss_binary_maps
-        losses = {'loss': loss_all+ cbn_loss, \
+        losses = {'loss': loss_all + cbn_loss, \
                   "loss_shrink_maps": loss_shrink_maps, \
                   "loss_threshold_maps": loss_threshold_maps, \
                   "loss_binary_maps": loss_binary_maps, \

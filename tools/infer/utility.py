@@ -269,6 +269,8 @@ def create_predictor(args, mode, logger):
         config.disable_glog_info()
         config.delete_pass("conv_transpose_eltwiseadd_bn_fuse_pass")
         config.delete_pass("matmul_transpose_reshape_fuse_pass")
+        config.delete_pass("fc_mkldnn_pass")
+        config.delete_pass("fc_act_mkldnn_fuse_pass")
         if mode == 're':
             config.delete_pass("simplify_with_basic_ops_pass")
         if mode == 'table':

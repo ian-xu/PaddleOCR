@@ -32,7 +32,7 @@ def get_bias_attr(k):
 
 
 class Head(nn.Layer):
-    def __init__(self, in_channels, kernel_list=[3, 2, 2], **kwargs):
+    def __init__(self, in_channels, kernel_list=[3, 2, 2], num_class=8, **kwargs):
         super(Head, self).__init__()
 
         self.conv1 = nn.Conv2D(
@@ -67,7 +67,7 @@ class Head(nn.Layer):
             act="relu")
         self.conv3 = nn.Conv2DTranspose(
             in_channels=in_channels // 4,
-            out_channels=1,
+            out_channels=num_class,
             kernel_size=kernel_list[2],
             stride=2,
             weight_attr=ParamAttr(
